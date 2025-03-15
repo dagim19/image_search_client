@@ -11,6 +11,11 @@ const ImageSearchApp = () => {
   const [loading, setLoading] = useState(false);
   const observer = useRef();
 
+  // Cloudinary configuration
+  const cloudName = 'du9ikhnkq';
+  const cloudinaryUrl = `https://res.cloudinary.com/${cloudName}/image/upload`;
+  const folderName = 'image_search_app'; // Update this to your Cloudinary folder name
+
   const lastImageElementRef = useCallback(
     (node) => {
       if (observer.current) observer.current.disconnect();
@@ -59,15 +64,23 @@ const ImageSearchApp = () => {
     return () => clearTimeout(debounceSearch);
   }, [query, images, kValue]);
 
-  // Add this at the top of your component or in a separate CSS file
+  // Function to get Cloudinary URL for an image
+  const getCloudinaryUrl = (imageName) => {
+    // Remove file extension for public_id
+    const publicId = imageName.split('.')[0];
+    
+    // Construct the URL with transformations
+    // auto format and quality for optimization
+    return `${cloudinaryUrl}/f_auto,q_auto/${folderName}/${publicId}`;
+  };
+
+  // Add Google Fonts
   useEffect(() => {
-    // Create a link element for Google Fonts
     const link = document.createElement('link');
     link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
     
-    // Clean up function to remove the link when component unmounts
     return () => {
       document.head.removeChild(link);
     };
@@ -76,7 +89,6 @@ const ImageSearchApp = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-6" style={{ fontFamily: "'Inter', sans-serif" }}>
       <div className="max-w-7xl mx-auto">
-        {/* Font styling is applied via className */}
         <div className="mb-8 text-center">
           <p className="text-lg">
             Developed by{' '}
@@ -170,7 +182,7 @@ const ImageSearchApp = () => {
                 className="break-inside-avoid mb-6"
               >
                 <img
-                  src={`http://localhost/images/${image}`}
+                  src={getCloudinaryUrl(image)}
                   alt={`Search result ${index + 1}`}
                   className="w-full rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
                   loading="lazy"
